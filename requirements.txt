@@ -2,5 +2,9 @@ fastapi
 uvicorn
 sqlalchemy
 pydantic
+pydantic-settings
 python-dotenv
 psycopg2
+passlib[bcrypt]
+python-multipart
+pydantic[email]
