@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
-from sqlalchemy.sql import func
 from core.database import Base
 
 class Item(Base):
@@ -9,5 +8,4 @@ class Item(Base):
     name = Column(String, nullable=False, index=True)
     description = Column(String, nullable=True)
     price = Column(Float, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), server_default="now()")

@@ -22,7 +22,6 @@ class ItemUpdate(BaseModel):
 class Item(ItemBase):
     id: int
     created_at: datetime
-    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
