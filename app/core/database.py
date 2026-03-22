@@ -22,6 +22,5 @@ def get_db():
 
 
 def init_db():
-    """Инициализация базы данных - создание всех таблиц"""
-    from models import user, item
-    Base.metadata.create_all(bind=engine)
+    """Инициализация базы данных - таблицы создаются через Alembic миграции"""
+    pass

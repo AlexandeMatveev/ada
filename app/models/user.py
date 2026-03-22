@@ -1,3 +1,5 @@
+from xmlrpc.client import Boolean
+
 from core.database import Base
 from sqlalchemy import Column, Integer, String, DateTime
 

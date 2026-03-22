@@ -1,47 +1,33 @@
-from typing import List, Optional
 from sqlalchemy.orm import Session
-from models.user import User
-from schemas.user import UserCreate, UserUpdate
-from crud.user import crud_user
+from typing import List, Optional
+from crud.user import user_crud
+from schemas.user import UserCreate, UserUpdate, UserInDB
 
 
 class UserService:
     def __init__(self):
-        self.crud = crud_user
+        self.crud = user_crud
 
-    def get(self, db: Session, id: int) -> Optional[User]:
-        return self.crud.get(db, id)
+    def create(self, db: Session, obj_in: UserCreate) -> UserInDB:
+        return self.crud.create(db, obj_in=obj_in)
 
-    def get_multi(self, db: Session, skip: int = 0, limit: int = 100) -> List[User]:
+    def get(self, db: Session, id: int) -> Optional[UserInDB]:
+        return self.crud.get(db, id=id)
+
+    def get_multi(self, db: Session, skip: int = 0, limit: int = 100) -> List[UserInDB]:
         return self.crud.get_multi(db, skip=skip, limit=limit)
 
-    def get_by_username(self, db: Session, username: str) -> Optional[User]:
-        return self.crud.get_by_username(db, username)
-
-    def get_by_email(self, db: Session, email: str) -> Optional[User]:
-        return self.crud.get_by_email(db, email)
-
-    def get_active(self, db: Session) -> List[User]:
+    def get_active(self, db: Session) -> List[UserInDB]:
         return self.crud.get_active(db)
 
-    def create(self, db: Session, obj_in: UserCreate) -> User:
-        # Проверка уникальности
-        if self.crud.get_by_username(db, obj_in.username):
-            from fastapi import HTTPException
-            raise HTTPException(status_code=400, detail="Username already exists")
-        if self.crud.get_by_email(db, obj_in.email):
-            from fastapi import HTTPException
-            raise HTTPException(status_code=400, detail="Email already exists")
-        return self.crud.create(db, obj_in)
+    def update(self, db: Session, id: int, obj_in: UserUpdate) -> Optional[UserInDB]:
+        return self.crud.update(db, id=id, obj_in=obj_in)
 
-    def update(self, db: Session, id: int, obj_in: UserUpdate) -> Optional[User]:
-        return self.crud.update(db, id, obj_in)
+    def delete(self, db: Session, id: int) -> Optional[UserInDB]:
+        return self.crud.delete(db, id=id)
 
-    def delete(self, db: Session, id: int) -> Optional[User]:
-        return self.crud.delete(db, id)
-
-    def toggle_active(self, db: Session, id: int, is_active: bool) -> Optional[User]:
-        return self.crud.toggle_active(db, id, is_active)
+    def toggle_active(self, db: Session, user_id: int, is_active: bool) -> Optional[UserInDB]:
+        return self.crud.toggle_active(db, user_id, is_active)
 
 
 user_service = UserService()
