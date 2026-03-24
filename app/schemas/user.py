@@ -1,42 +1,38 @@
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, EmailStr,Field
 from datetime import datetime
 from typing import Optional
 
 
 class UserBase(BaseModel):
-    username: str = Field(..., min_length=3, max_length=50)
+    username: str
     email: EmailStr
-    full_name: Optional[str] = Field(None, max_length=100)
+    full_name: Optional[str] = None
 
 
-class UserCreate(UserBase):
+
+class UserCreate(BaseModel):
+    email: EmailStr
+    username: str = Field(..., min_length=3, max_length=50)
     password: str = Field(..., min_length=6)
+    full_name: Optional[str] = None
 
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    username: str
+    full_name: Optional[str] = None
 
 class UserUpdate(BaseModel):
-    username: Optional[str] = Field(None, min_length=3, max_length=50)
+    username: Optional[str] = None
     email: Optional[EmailStr] = None
-    full_name: Optional[str] = Field(None, max_length=100)
-
-    password: Optional[str] = Field(None, min_length=6)
-
-
-# UserInDB — для внутреннего использования (с хешем пароля)
-class UserInDB(UserBase):
-    id: int
-    hashed_password: str
-    is_active: bool
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-
-    model_config = ConfigDict(from_attributes=True)
+    full_name: Optional[str] = None
+    is_active: Optional[bool] = None
 
 
-# User — для ответов API (без пароля)
 class User(UserBase):
     id: int
-
+    is_active: bool
     created_at: datetime
-    updated_at: Optional[datetime] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        from_attributes = True
