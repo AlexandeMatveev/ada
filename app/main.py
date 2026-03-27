@@ -1,10 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-
+from models.user import User
 from core.config import settings
 from core.database import init_db
 from api.api_v1.api import api_router
-
+from core.security import get_current_user
 # Инициализация базы данных
 init_db()
 
@@ -30,6 +30,13 @@ app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 @app.get("/")
 def read_root():
     return {"message": "FastAPI Clean Architecture", "version": settings.APP_VERSION}
+
+@app.get("/protected")
+def protected_endpoint(current_user: User = Depends(get_current_user)):
+    """
+    Только для аутентифицированных пользователей
+    """
+    return {"message": f"Hello {current_user.username}"}
 
 
 @app.get("/health")
