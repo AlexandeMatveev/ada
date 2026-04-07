@@ -1,23 +1,57 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from core.database import get_db
-from schemas.user import UserCreate
-from schemas.token import LoginRequest
-from services.auth_service import auth_service
-from core.security import create_access_token, get_current_user
 
-router = APIRouter( tags=["auth"])
+from core.database import get_db
+from core.security import get_current_user, create_access_token, create_refresh_token
+from schemas.user import UserCreate
+from schemas.token import LoginRequest, RefreshTokenRequest
+from services.auth_service import auth_service
+from models.user import User
+
+router = APIRouter(tags=["auth"])
+
 
 @router.post("/register")
-def register(data: UserCreate, db: Session = Depends(get_db)):
-    user = auth_service.register(db, data)
-    return {"access_token": create_access_token({"sub": str(user.id)}), "token_type": "bearer"}
+def register(user_data: UserCreate, db: Session = Depends(get_db)):
+    """Регистрация - возвращает токены"""
+    return auth_service.register(db, user_data)
+
 
 @router.post("/login")
-def login(data: LoginRequest, db: Session = Depends(get_db)):
-    user = auth_service.login(db, data.email, data.password)
-    return {"access_token": create_access_token({"sub": str(user.id)}), "token_type": "bearer"}
+def login(login_data: LoginRequest, db: Session = Depends(get_db)):
+    """Вход - возвращает токены"""
+    # auth_service.login возвращает пользователя
+    user = auth_service.login(db, login_data.email, login_data.password)
+
+    # Создаем токены здесь
+    access_token = create_access_token(data={"sub": str(user.id)})
+    refresh_token = create_refresh_token(data={"sub": str(user.id)})
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "token_type": "bearer"
+    }
+
+
+@router.post("/refresh")
+def refresh(refresh_data: RefreshTokenRequest, db: Session = Depends(get_db)):
+    """Обновление access токена"""
+    return auth_service.refresh(db, refresh_data.refresh_token)
+
 
 @router.get("/me")
-def me(current_user=Depends(get_current_user)):
-    return current_user
+def get_me(current_user: User = Depends(get_current_user)):
+    """Получить текущего пользователя"""
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "username": current_user.username,
+        "full_name": current_user.full_name
+    }
+
+
+@router.post("/logout")
+def logout():
+    """Выход - удалите токены на клиенте"""
+    return {"message": "Successfully logged out"}
