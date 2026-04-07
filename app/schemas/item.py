@@ -4,7 +4,7 @@ from typing import Optional
 
 
 class ItemBase(BaseModel):
-    name: str
+    title: str
     description: Optional[str] = None
     price: float
 
@@ -21,7 +21,7 @@ class ItemUpdate(BaseModel):
 
 class Item(ItemBase):
     id: int
-    created_at: datetime
+
 
     class Config:
         from_attributes = True

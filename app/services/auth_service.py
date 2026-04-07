@@ -8,7 +8,7 @@ from schemas.user import UserCreate
 class AuthService:
     def register(self, db: Session, user_data: UserCreate):
         # Проверка существования
-        existing = user_crud.get_by_email(db, user_data.email)
+        existing = crud_user.get_by_email(db, user_data.email)
         if existing:
             raise HTTPException(400, "Email already registered")
 

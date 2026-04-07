@@ -1,12 +1,20 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime
+from sqlalchemy import Column, Integer, String, Float, DateTime,ForeignKey,Text,Boolean
 from core.database import Base
+
+from sqlalchemy.orm import relationship, sessionmaker
 
 class Item(Base):
     __tablename__ = "items"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False, index=True)
-    description = Column(String, nullable=True)
-    Review = Column(String, nullable=True)
-    price = Column(Float, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default="now()")
+    title = Column(String, index=True)
+    description = Column(Text)
+    price = Column(Float)  # Добавьте
+    stock = Column(Integer)  # Добавьте
+    is_available = Column(Boolean, default=True)
+    owner_id = Column(Integer, ForeignKey("users.id"))
+
+
+
+    order_items = relationship("OrderItem", back_populates="item", cascade="all, delete-orphan")
+    owner = relationship("User", back_populates="items")

@@ -2,14 +2,13 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'http://localhost:8000/api/v1',
 });
 
 // Флаг для предотвращения множественных обновлений токена
 let isRefreshing = false;
 let failedQueue = [];
 
-// Обработка очереди запросов
 const processQueue = (error, token = null) => {
   failedQueue.forEach(prom => {
     if (error) {
@@ -36,10 +35,8 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Если ошибка 401 и запрос не повторялся
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        // Если уже обновляем токен, добавляем запрос в очередь
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -55,7 +52,6 @@ api.interceptors.response.use(
 
       const refreshToken = localStorage.getItem('refreshToken');
 
-      // Пробуем обновить токен
       try {
         const response = await axios.post('http://localhost:8000/api/v1/auth/refresh', {
           refresh_token: refreshToken
@@ -64,15 +60,11 @@ api.interceptors.response.use(
         const { access_token } = response.data;
         localStorage.setItem('accessToken', access_token);
 
-        // Обновляем заголовок и повторяем запрос
-        originalRequest.headers.Authorization = `Bearer ${access_token}`;
-
-        // Обрабатываем очередь запросов
         processQueue(null, access_token);
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
 
         return api(originalRequest);
       } catch (refreshError) {
-        // Если refresh токен тоже истек - разлогиниваем
         processQueue(refreshError, null);
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
