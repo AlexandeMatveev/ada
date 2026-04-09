@@ -32,15 +32,16 @@ class OrderItemResponse(OrderItemBase):
         from_attributes = True
 
 
-# Схемы заказов
+
 class OrderBase(BaseModel):
-    shipping_address: str = Field(..., min_length=5, max_length=500)
-    phone: str = Field(..., pattern=r'^\+?[0-9]{10,15}$')
+    shipping_address: str = Field(..., min_length=1)   # убрали min_length=5
+    phone: str = Field(..., min_length=1)              # убрали pattern
     notes: Optional[str] = None
 
 
 class OrderCreate(OrderBase):
     items: List[OrderItemCreate]
+
 
 
 class OrderUpdate(BaseModel):

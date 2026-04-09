@@ -11,13 +11,13 @@ from models.user import User
 router = APIRouter()
 
 @router.post("/", response_model=OrderResponse)
-def create_order(
+async def create_order(
     order_data: OrderCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Создание нового заказа"""
-    return order_service.create_order(db, current_user.id, order_data)
+    return await order_service.create_order(db, current_user.id, order_data)
+
 
 @router.get("/", response_model=List[OrderListResponse])
 def get_my_orders(

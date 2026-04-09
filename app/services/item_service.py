@@ -6,6 +6,7 @@ from schemas.item import ItemCreate, ItemUpdate
 from crud.item import crud_item
 
 
+
 class ItemService:
     def __init__(self):
         self.crud = crud_item

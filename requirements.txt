@@ -12,3 +12,6 @@ alembic
 python-jose[cryptography]
 passlib[argon2]
 passlib[bcrypt]
+
+
+aio-pika

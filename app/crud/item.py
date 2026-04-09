@@ -26,6 +26,7 @@ class CRUDItem:
         if db_item:
             update_data = obj_in.model_dump(exclude_unset=True)
             for field, value in update_data.items():
+
                 setattr(db_item, field, value)
             db.commit()
             db.refresh(db_item)
